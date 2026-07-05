@@ -42,6 +42,18 @@ export async function processNode(node: NodeRow): Promise<void> {
       }
     }
 
+    // 1b. Guaranteed visual: sites like Pinterest block scrapers outright,
+    // so if no preview image could be found, fall back to a live page
+    // screenshot (WordPress mShots — free, keyless, fine for personal use).
+    // The first request returns a "generating" placeholder; the real
+    // screenshot replaces it on subsequent loads.
+    if (!thumbnail && node.source_url) {
+      thumbnail = `https://s.wordpress.com/mshots/v1/${encodeURIComponent(
+        node.source_url
+      )}?w=1200`;
+      patch.thumbnail_url = thumbnail;
+    }
+
     // 2. Video download + transcription for reels / anything with a video URL.
     let transcript = node.transcript;
     const isVideo = node.source_type === "instagram_reel" || !!node.video_url;

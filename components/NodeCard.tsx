@@ -55,11 +55,12 @@ export default function NodeCard({ node, index, onOpen }: NodeCardProps) {
           />
         ) : (
           <div className="border border-line px-4 py-5 transition-colors group-hover:border-ink group-focus-visible:border-ink">
-            {node.source_type === "manual_note" ? (
-              <p className="mb-2 text-[9px] uppercase tracking-[0.16em] text-dim">Note</p>
-            ) : domain ? (
-              <p className="mb-2 text-[9px] uppercase tracking-[0.16em] text-dim">{domain}</p>
-            ) : null}
+            <div className="mb-2.5 flex items-center gap-2">
+              <SourceBadge type={node.source_type} />
+              <p className="text-[9px] uppercase tracking-[0.16em] text-dim">
+                {node.source_type === "manual_note" ? "Note" : domain ?? "Saved item"}
+              </p>
+            </div>
             {titleIsUrl ? (
               <p className="break-all text-[11px] leading-relaxed text-dim line-clamp-3">
                 {node.title}
@@ -80,10 +81,13 @@ export default function NodeCard({ node, index, onOpen }: NodeCardProps) {
           </div>
         )}
 
-        {/* Type badge — always visible so every card reads at a glance */}
-        <div className="absolute left-2 top-2">
-          <SourceBadge type={node.source_type} />
-        </div>
+        {/* Type badge — overlaid on image cards only (text cards carry it
+            inline in the label row, so nothing overlaps) */}
+        {showImage && (
+          <div className="absolute left-2 top-2">
+            <SourceBadge type={node.source_type} />
+          </div>
+        )}
 
         {/* Play chip on anything with video */}
         {isVideo && showImage && (
