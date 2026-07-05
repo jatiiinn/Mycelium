@@ -1,7 +1,7 @@
 # Mycelium enrichment worker — includes ffmpeg + yt-dlp, which Render's
 # default Node environment does not have. Deploy this on Render as a
 # Docker-based service (see README.md in this folder).
-FROM node:20-slim
+FROM node:22-slim
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ffmpeg python3 ca-certificates curl \
