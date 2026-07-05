@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* NOTE: This styling is a provisional dark/minimal baseline. The user's UI
+   reference images are the source of truth for the final look. */
+
+::selection {
+  background: #c6d2ab;
+  color: #0e0f0d;
+}
+
+/* react-masonry-css layout classes */
+.masonry {
+  display: flex;
+  margin-left: -14px;
+  width: auto;
+}
+.masonry-col {
+  padding-left: 14px;
+  background-clip: padding-box;
+}
+
+/* loading shimmer for pending/processing cards */
+@keyframes shimmer {
+  0% { background-position: -300px 0; }
+  100% { background-position: 300px 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, #1c1f19 25%, #262a22 50%, #1c1f19 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer { animation: none; }
+}
+
+/* thin scrollbars that fit the theme */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #262a22 transparent;
+}
