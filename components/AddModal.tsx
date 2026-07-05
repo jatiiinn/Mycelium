@@ -72,7 +72,7 @@ export default function AddModal({ onClose, onAdded }: AddModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -82,38 +82,46 @@ export default function AddModal({ onClose, onAdded }: AddModalProps) {
     >
       <form
         onSubmit={submit}
-        className="relative w-full max-w-md rounded-card border border-seam bg-surface p-5"
+        className="relative w-full max-w-md border border-line bg-paper p-6"
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-3 top-3 rounded-full p-1.5 text-moss hover:text-fog"
+          className="absolute right-3 top-3 p-1.5 text-dim transition-colors hover:text-ink"
         >
           <CloseIcon />
         </button>
 
-        <h2 className="text-base font-medium">Add to mycelium</h2>
-        <p className="mt-0.5 text-xs text-moss">
+        <h2 className="text-sm font-medium text-ink">Add to Mycelium</h2>
+        <p className="mt-1 text-[11px] text-dim">
           It gets tagged and summarized automatically after saving.
         </p>
 
-        {/* Tabs */}
-        <div className="mt-4 flex gap-1 rounded-full border border-seam bg-ink p-1">
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => {
-                setTab(t.id);
-                setError(null);
-              }}
-              className={`flex-1 rounded-full py-1.5 text-sm transition-colors ${
-                tab === t.id ? "bg-raised text-fog" : "text-moss hover:text-fog"
-              }`}
-            >
-              {t.label}
-            </button>
+        {/* Tabs — quiet text row with underline, like the reference nav */}
+        <div className="mt-5 flex items-center gap-1.5 border-b border-line pb-2 text-xs">
+          {tabs.map((t, i) => (
+            <span key={t.id} className="flex items-center gap-1.5">
+              {i > 0 && (
+                <span className="text-dim/60" aria-hidden>
+                  /
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setTab(t.id);
+                  setError(null);
+                }}
+                className={
+                  tab === t.id
+                    ? "text-ink underline underline-offset-4"
+                    : "text-dim transition-colors hover:text-ink"
+                }
+              >
+                {t.label}
+              </button>
+            </span>
           ))}
         </div>
 
@@ -125,14 +133,14 @@ export default function AddModal({ onClose, onAdded }: AddModalProps) {
               placeholder="https://…"
               aria-label="Link URL"
               required
-              className="w-full rounded-card border border-seam bg-ink px-3.5 py-2.5 text-sm text-fog placeholder:text-moss outline-none focus:border-lichen"
+              className="w-full border border-line bg-paper px-3.5 py-2.5 text-xs text-ink placeholder:text-dim outline-none transition-colors focus:border-ink"
             />
           )}
 
           {tab === "image" && (
-            <label className="block cursor-pointer rounded-card border border-dashed border-seam bg-ink px-3.5 py-6 text-center text-sm text-moss hover:border-lichen">
+            <label className="block cursor-pointer border border-dashed border-line px-3.5 py-7 text-center text-xs text-dim transition-colors hover:border-ink">
               {file ? (
-                <span className="text-fog">{file.name}</span>
+                <span className="text-ink">{file.name}</span>
               ) : (
                 "Tap to choose an image (up to 15 MB)"
               )}
@@ -153,7 +161,7 @@ export default function AddModal({ onClose, onAdded }: AddModalProps) {
               aria-label="Note text"
               required
               rows={5}
-              className="w-full resize-y rounded-card border border-seam bg-ink px-3.5 py-2.5 text-sm text-fog placeholder:text-moss outline-none focus:border-lichen"
+              className="w-full resize-y border border-line bg-paper px-3.5 py-2.5 text-xs text-ink placeholder:text-dim outline-none transition-colors focus:border-ink"
             />
           )}
 
@@ -162,16 +170,16 @@ export default function AddModal({ onClose, onAdded }: AddModalProps) {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title (optional)"
             aria-label="Title"
-            className="w-full rounded-card border border-seam bg-ink px-3.5 py-2.5 text-sm text-fog placeholder:text-moss outline-none focus:border-lichen"
+            className="w-full border border-line bg-paper px-3.5 py-2.5 text-xs text-ink placeholder:text-dim outline-none transition-colors focus:border-ink"
           />
         </div>
 
-        {error && <p className="mt-3 text-sm text-ember">{error}</p>}
+        {error && <p className="mt-3 text-xs text-ember">{error}</p>}
 
         <button
           type="submit"
           disabled={busy}
-          className="mt-4 w-full rounded-card bg-lichen px-4 py-2.5 text-sm font-medium text-ink disabled:opacity-50"
+          className="mt-5 w-full bg-ink px-4 py-2.5 text-xs font-medium text-paper disabled:opacity-50"
         >
           {busy ? "Saving…" : "Save"}
         </button>

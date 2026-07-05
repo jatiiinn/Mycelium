@@ -41,13 +41,13 @@ export default function TagEditor({ tags, onSave }: TagEditorProps) {
         {draft.map((t) => (
           <span
             key={t}
-            className="inline-flex items-center gap-1 rounded-full bg-raised px-2.5 py-1 text-xs text-lichen"
+            className="inline-flex items-center gap-1.5 border border-line px-2.5 py-1 text-[11px] text-ink"
           >
             {t}
             <button
               onClick={() => setDraft(draft.filter((x) => x !== t))}
               aria-label={`Remove tag ${t}`}
-              className="text-moss hover:text-fog"
+              className="text-dim transition-colors hover:text-ink"
             >
               <CloseIcon className="h-3 w-3" />
             </button>
@@ -65,30 +65,30 @@ export default function TagEditor({ tags, onSave }: TagEditorProps) {
           onBlur={addFromInput}
           placeholder="Add tag…"
           aria-label="Add tag"
-          className="min-w-[90px] flex-1 rounded-full border border-seam bg-surface px-3 py-1 text-xs text-fog placeholder:text-moss outline-none focus:border-lichen"
+          className="min-w-[90px] flex-1 border-b border-line bg-transparent px-1 py-1 text-[11px] text-ink placeholder:text-dim outline-none transition-colors focus:border-ink"
         />
       </div>
       {dirty && (
-        <div className="mt-2 flex items-center gap-2">
+        <div className="mt-3 flex items-center gap-3">
           <button
             onClick={save}
             disabled={saving}
-            className="rounded-full bg-lichen px-3 py-1 text-xs font-medium text-ink disabled:opacity-50"
+            className="bg-ink px-3 py-1.5 text-[11px] font-medium text-paper disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save tags"}
           </button>
           <button
             onClick={() => setDraft(tags)}
-            className="rounded-full px-2 py-1 text-xs text-moss hover:text-fog"
+            className="text-[11px] text-dim transition-colors hover:text-ink"
           >
             Cancel
           </button>
-          <span className="text-[11px] text-moss">
+          <span className="text-[10px] text-dim">
             Saved tags stop being changed by auto-tagging.
           </span>
         </div>
       )}
-      {error && <p className="mt-2 text-xs text-ember">{error}</p>}
+      {error && <p className="mt-2 text-[11px] text-ember">{error}</p>}
     </div>
   );
 }

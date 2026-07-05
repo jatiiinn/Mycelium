@@ -137,7 +137,7 @@ export function SourceBadge({ type }: { type: SourceType }) {
   return (
     <span
       title={label}
-      className="inline-flex items-center justify-center rounded-full bg-ink/70 p-1.5 text-fog backdrop-blur-sm"
+      className="inline-flex items-center justify-center border border-line bg-paper/90 p-1.5 text-ink backdrop-blur-sm"
     >
       {icon}
       {type === "instagram_reel" && <PlayIcon className="ml-0.5 h-3 w-3" />}

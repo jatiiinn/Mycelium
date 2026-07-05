@@ -32,14 +32,11 @@ export default function UnlockPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6">
+    <main className="flex min-h-screen items-center justify-center px-6">
       <form onSubmit={submit} className="w-full max-w-xs">
-        <div className="mb-8 text-center">
-          <span className="inline-flex items-center gap-2 text-lg tracking-wide text-fog">
-            <span className="h-1.5 w-1.5 rounded-full bg-lichen" aria-hidden />
-            mycelium
-          </span>
-          <p className="mt-2 text-sm text-moss">Enter your passcode to open your saves.</p>
+        <div className="mb-10 text-center">
+          <span className="text-sm tracking-wide text-ink">Mycelium</span>
+          <p className="mt-2 text-xs text-dim">Enter your passcode to open your saves.</p>
         </div>
         <input
           type="password"
@@ -48,13 +45,13 @@ export default function UnlockPage() {
           onChange={(e) => setPasscode(e.target.value)}
           placeholder="Passcode"
           aria-label="Passcode"
-          className="w-full rounded-card border border-seam bg-surface px-4 py-3 text-fog placeholder:text-moss outline-none focus:border-lichen"
+          className="w-full border border-line bg-paper px-4 py-3 text-sm text-ink placeholder:text-dim outline-none transition-colors focus:border-ink"
         />
-        {error && <p className="mt-3 text-sm text-ember">{error}</p>}
+        {error && <p className="mt-3 text-xs text-ember">{error}</p>}
         <button
           type="submit"
           disabled={busy || !passcode}
-          className="mt-4 w-full rounded-card bg-lichen px-4 py-3 font-medium text-ink transition-opacity disabled:opacity-40"
+          className="mt-4 w-full bg-ink px-4 py-3 text-sm font-medium text-paper transition-opacity disabled:opacity-40"
         >
           {busy ? "Checking…" : "Unlock"}
         </button>

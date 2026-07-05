@@ -1,26 +1,32 @@
 "use client";
 
+// Card matched to the reference: bare thumbnail on white with a small
+// index number and quiet tag text beneath — no boxes, no rounded chrome.
+
 import { useState } from "react";
 import type { NodeItem } from "@/lib/types";
 import { SourceBadge } from "./Icons";
 
 interface NodeCardProps {
   node: NodeItem;
+  index: number; // position in the current grid → "001", "002", …
   onOpen: (id: string) => void;
 }
 
-export default function NodeCard({ node, onOpen }: NodeCardProps) {
+export default function NodeCard({ node, index, onOpen }: NodeCardProps) {
   const [imgBroken, setImgBroken] = useState(false);
 
   const busy =
     node.enrichment_status === "pending" || node.enrichment_status === "processing";
   const failed = node.enrichment_status === "failed";
   const showImage = !!node.thumbnail_url && !imgBroken;
+  const num = String(index + 1).padStart(3, "0");
 
   return (
     <button
       onClick={() => onOpen(node.id)}
-      className="group mb-3.5 block w-full overflow-hidden rounded-card border border-seam bg-surface text-left transition-colors hover:border-moss/60 focus:outline-none focus-visible:border-lichen sm:mb-4"
+      className="group mb-8 block w-full text-left focus:outline-none sm:mb-10"
+      aria-label={node.title || "Saved item"}
     >
       {/* Media / text preview */}
       <div className="relative">
@@ -31,62 +37,45 @@ export default function NodeCard({ node, onOpen }: NodeCardProps) {
             alt={node.title || "Saved item"}
             loading="lazy"
             onError={() => setImgBroken(true)}
-            className="w-full object-cover"
+            className="w-full object-cover transition-opacity group-hover:opacity-90 group-focus-visible:opacity-90"
           />
         ) : (
-          <div className="px-4 pb-2 pt-4">
-            <p className="text-sm font-medium leading-snug text-fog line-clamp-3">
+          <div className="border border-line px-4 py-5 transition-colors group-hover:border-ink group-focus-visible:border-ink">
+            <p className="text-xs font-medium leading-snug text-ink line-clamp-3">
               {node.title || "Untitled"}
             </p>
             {node.description && (
-              <p className="mt-2 text-xs leading-relaxed text-moss line-clamp-5">
+              <p className="mt-2 text-[11px] leading-relaxed text-dim line-clamp-5">
                 {node.description}
               </p>
             )}
             {!node.description && imgBroken && (
-              <p className="mt-2 text-xs text-moss">Preview image unavailable.</p>
+              <p className="mt-2 text-[11px] text-dim">Preview image unavailable.</p>
             )}
           </div>
         )}
-        <div className="absolute left-2 top-2">
+        <div className="absolute left-2 top-2 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
           <SourceBadge type={node.source_type} />
         </div>
       </div>
 
-      {/* Footer: tags / shimmer / failed */}
-      <div className="px-3 py-2.5">
-        {showImage && (
-          <p className="mb-1.5 truncate text-xs text-moss">{node.title || "Untitled"}</p>
-        )}
+      {/* Caption row: index number + tags / shimmer / failed */}
+      <div className="mt-2 flex items-baseline justify-between gap-3 text-[11px]">
+        <span className="shrink-0 tabular-nums text-ink">{num}</span>
         {busy ? (
-          <div className="flex gap-1.5" aria-label="Organizing this save">
-            <span className="shimmer h-5 w-14 rounded-full" />
-            <span className="shimmer h-5 w-10 rounded-full" />
-            <span className="shimmer h-5 w-16 rounded-full" />
-          </div>
-        ) : failed ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-ember/10 px-2.5 py-1 text-xs text-ember">
-            <span className="h-1.5 w-1.5 rounded-full bg-ember" aria-hidden />
-            Enrichment failed — open to retry
+          <span className="flex gap-1.5" aria-label="Organizing this save">
+            <span className="shimmer h-3 w-12" />
+            <span className="shimmer h-3 w-8" />
           </span>
+        ) : failed ? (
+          <span className="truncate text-ember">failed — open to retry</span>
         ) : node.tags.length > 0 ? (
-          <div className="flex flex-wrap gap-1.5">
-            {node.tags.slice(0, 3).map((t) => (
-              <span
-                key={t}
-                className="rounded-full bg-raised px-2.5 py-1 text-xs text-lichen"
-              >
-                {t}
-              </span>
-            ))}
-            {node.tags.length > 3 && (
-              <span className="rounded-full px-1.5 py-1 text-xs text-moss">
-                +{node.tags.length - 3}
-              </span>
-            )}
-          </div>
+          <span className="truncate text-dim">
+            {node.tags.slice(0, 3).join("  ·  ")}
+            {node.tags.length > 3 ? `  +${node.tags.length - 3}` : ""}
+          </span>
         ) : (
-          <span className="text-xs text-moss">No tags</span>
+          <span className="text-dim/60">—</span>
         )}
       </div>
     </button>

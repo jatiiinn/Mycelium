@@ -80,11 +80,12 @@ Tags you edit by hand set `tags_edited_by_user` and are never auto-overwritten.
    | `CRON_SECRET` | a long random string (e.g. from https://1password.com/password-generator or `openssl rand -hex 24`) |
 
 4. Redeploy (Deployments → ⋯ → Redeploy) so the env vars take effect.
-5. `vercel.json` registers a cron hitting `/api/sync` every 10 minutes.
-   **Heads-up:** on Vercel's free **Hobby** plan, crons only run about once per
-   day. That's why the Render worker can ping `/api/sync` itself every 10
-   minutes — set `SYNC_URL` + `CRON_SECRET` on the worker (step 5) and syncing
-   is reliable on any plan.
+5. `vercel.json` registers a **daily** cron hitting `/api/sync` (Vercel's free
+   Hobby plan rejects deploys with more-frequent crons). The every-10-minutes
+   syncing is done by the Render worker instead — set `SYNC_URL` +
+   `CRON_SECRET` on the worker (step 5) and syncing runs every 10 minutes
+   reliably. (If you ever upgrade to Vercel Pro, you can change the schedule in
+   `vercel.json` back to `*/10 * * * *`.)
 
 ### 5. Deploy the worker to Render
 
@@ -134,9 +135,10 @@ query param"); set the same value in both Vercel and Render.
   key can read nothing. The app itself is gated by your passcode via an
   httpOnly cookie checked in middleware. No localStorage/sessionStorage is used
   anywhere.
-- **Styling is provisional** — a restrained dark/minimal baseline. Your UI
-  reference images are the source of truth; share them and the grid/typography/
-  spacing will be matched to them.
+- **Styling** follows the supplied homepage reference: white editorial canvas,
+  hairline rules, small monochrome type, numbered items (`001`, `002`, …), a
+  centered `Grid / Graph` switch (Graph disabled until phase 2), and quiet
+  search/tag controls. All functionality is unchanged.
 - Local development: `cp .env.example .env.local`, fill it in, `npm install`,
   `npm run dev` (root), and see `worker/README.md` for running the worker
   locally.

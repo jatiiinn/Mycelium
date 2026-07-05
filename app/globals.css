@@ -2,22 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-/* NOTE: This styling is a provisional dark/minimal baseline. The user's UI
-   reference images are the source of truth for the final look. */
+/* Light editorial theme matched to the homepage reference image. */
 
 ::selection {
-  background: #c6d2ab;
-  color: #0e0f0d;
+  background: #111111;
+  color: #ffffff;
 }
 
-/* react-masonry-css layout classes */
+/* react-masonry-css layout classes — wide, airy gutters like the reference */
 .masonry {
   display: flex;
-  margin-left: -14px;
+  margin-left: -28px;
   width: auto;
 }
 .masonry-col {
-  padding-left: 14px;
+  padding-left: 28px;
   background-clip: padding-box;
 }
 
@@ -27,7 +26,7 @@
   100% { background-position: 300px 0; }
 }
 .shimmer {
-  background: linear-gradient(90deg, #1c1f19 25%, #262a22 50%, #1c1f19 75%);
+  background: linear-gradient(90deg, #f4f4f4 25%, #eaeaea 50%, #f4f4f4 75%);
   background-size: 600px 100%;
   animation: shimmer 1.6s linear infinite;
 }
@@ -35,8 +34,8 @@
   .shimmer { animation: none; }
 }
 
-/* thin scrollbars that fit the theme */
+/* thin, quiet scrollbars */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #262a22 transparent;
+  scrollbar-color: #d9d9d9 transparent;
 }

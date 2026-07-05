@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
-// Provisional dark palette — the user's UI reference images are the source
-// of truth for the final look; adjust these tokens when those arrive.
+// Light editorial palette matched to the user's homepage reference:
+// white canvas, near-black text, hairline rules, monochrome chrome.
 const config: Config = {
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
   theme: {
@@ -13,17 +13,12 @@ const config: Config = {
         ],
       },
       colors: {
-        ink: "#0e0f0d",       // page background (near-black, faint green cast)
-        surface: "#151713",   // cards, header
-        raised: "#1c1f19",    // hover / inputs
-        seam: "#262a22",      // borders
-        fog: "#e7eae1",       // primary text
-        moss: "#8b937f",      // muted text
-        lichen: "#c6d2ab",    // accent (tags, focus, links)
-        ember: "#d99a8a",     // errors / failed state
-      },
-      borderRadius: {
-        card: "14px",
+        paper: "#ffffff",  // page + cards
+        ink: "#111111",    // primary text
+        dim: "#8a8a8a",    // secondary text
+        line: "#e6e6e6",   // hairline borders
+        faint: "#f4f4f4",  // hover fills / shimmer base
+        ember: "#b23a2f",  // errors / failed state
       },
     },
   },

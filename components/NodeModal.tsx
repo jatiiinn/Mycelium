@@ -1,8 +1,7 @@
 "use client";
 
-// Detail view. A modal (rather than a /node/[id] page) keeps the masonry grid,
-// its scroll position, and any active search/filter intact while browsing —
-// which fits how a visual dump is actually skimmed.
+// Detail view. A modal (rather than a /node/[id] page) keeps the grid,
+// its scroll position, and any active search/filter intact while browsing.
 
 import { useCallback, useEffect, useState } from "react";
 import type { NodeItem, RelatedNode } from "@/lib/types";
@@ -96,7 +95,7 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-3 backdrop-blur-sm sm:p-6"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 sm:p-6"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -104,27 +103,27 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
       aria-modal="true"
       aria-label={node?.title || "Save details"}
     >
-      <div className="relative my-auto w-full max-w-2xl rounded-card border border-seam bg-surface">
+      <div className="relative my-auto w-full max-w-2xl border border-line bg-paper">
         <button
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-3 top-3 z-10 rounded-full bg-ink/70 p-2 text-fog backdrop-blur-sm hover:text-lichen"
+          className="absolute right-3 top-3 z-10 border border-line bg-paper/90 p-2 text-ink backdrop-blur-sm transition-colors hover:bg-ink hover:text-paper"
         >
           <CloseIcon />
         </button>
 
         {loading ? (
           <div className="space-y-3 p-6">
-            <div className="shimmer h-64 w-full rounded-card" />
-            <div className="shimmer h-5 w-2/3 rounded-full" />
-            <div className="shimmer h-4 w-1/2 rounded-full" />
+            <div className="shimmer h-64 w-full" />
+            <div className="shimmer h-4 w-2/3" />
+            <div className="shimmer h-3 w-1/2" />
           </div>
         ) : error || !node ? (
-          <div className="p-8 text-center">
-            <p className="text-sm text-ember">{error ?? "This save couldn't be loaded."}</p>
+          <div className="p-10 text-center">
+            <p className="text-xs text-ember">{error ?? "This save couldn't be loaded."}</p>
             <button
               onClick={() => load(nodeId)}
-              className="mt-4 rounded-full border border-seam px-4 py-2 text-sm text-fog hover:border-lichen"
+              className="mt-5 border border-ink px-4 py-2 text-xs text-ink transition-colors hover:bg-ink hover:text-paper"
             >
               Try again
             </button>
@@ -138,7 +137,7 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
                 controls
                 playsInline
                 poster={node.thumbnail_url ?? undefined}
-                className="max-h-[65vh] w-full rounded-t-card bg-black object-contain"
+                className="max-h-[65vh] w-full border-b border-line bg-faint object-contain"
               />
             ) : node.thumbnail_url && !imgBroken ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -146,19 +145,19 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
                 src={node.thumbnail_url}
                 alt={node.title || "Saved item"}
                 onError={() => setImgBroken(true)}
-                className="max-h-[65vh] w-full rounded-t-card bg-black object-contain"
+                className="max-h-[65vh] w-full border-b border-line bg-faint object-contain"
               />
             ) : null}
 
-            <div className="space-y-5 p-5 sm:p-6">
+            <div className="space-y-6 p-5 sm:p-7">
               {/* Title + source */}
               <div className="flex items-start gap-3 pr-8">
                 <SourceBadge type={node.source_type} />
                 <div className="min-w-0">
-                  <h2 className="text-base font-medium leading-snug text-fog">
+                  <h2 className="text-sm font-medium leading-snug text-ink">
                     {node.title || "Untitled"}
                   </h2>
-                  <p className="mt-0.5 text-xs text-moss">
+                  <p className="mt-1 text-[11px] text-dim">
                     Saved {new Date(node.created_at).toLocaleDateString()}
                   </p>
                 </div>
@@ -166,14 +165,14 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
 
               {/* Failed state */}
               {node.enrichment_status === "failed" && (
-                <div className="rounded-card border border-ember/30 bg-ember/10 p-3 text-sm">
+                <div className="border border-ember/40 p-3 text-xs">
                   <p className="text-ember">
                     Automatic organizing failed for this save
                     {node.enrichment_error ? ` (${node.enrichment_error.slice(0, 160)})` : ""}.
                   </p>
                   <button
                     onClick={retry}
-                    className="mt-2 rounded-full bg-ember px-3 py-1 text-xs font-medium text-ink"
+                    className="mt-2 bg-ember px-3 py-1.5 text-[11px] font-medium text-paper"
                   >
                     Retry enrichment
                   </button>
@@ -181,7 +180,7 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
               )}
               {(node.enrichment_status === "pending" ||
                 node.enrichment_status === "processing") && (
-                <p className="rounded-card bg-raised p-3 text-sm text-moss">
+                <p className="border border-line bg-faint p-3 text-xs text-dim">
                   Still organizing this save — tags, summary and transcript appear here when
                   it finishes (usually within a couple of minutes).
                 </p>
@@ -190,16 +189,20 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
               {/* AI summary */}
               {node.ai_summary && (
                 <div>
-                  <h3 className="mb-1 text-xs uppercase tracking-wider text-moss">Why keep this</h3>
-                  <p className="text-sm leading-relaxed text-fog">{node.ai_summary}</p>
+                  <h3 className="mb-1.5 text-[10px] uppercase tracking-[0.14em] text-dim">
+                    Why keep this
+                  </h3>
+                  <p className="text-xs leading-relaxed text-ink">{node.ai_summary}</p>
                 </div>
               )}
 
               {/* Original description / caption */}
               {node.description && (
                 <div>
-                  <h3 className="mb-1 text-xs uppercase tracking-wider text-moss">Original caption</h3>
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-moss">
+                  <h3 className="mb-1.5 text-[10px] uppercase tracking-[0.14em] text-dim">
+                    Original caption
+                  </h3>
+                  <p className="whitespace-pre-wrap text-xs leading-relaxed text-dim">
                     {node.description}
                   </p>
                 </div>
@@ -208,8 +211,10 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
               {/* Transcript */}
               {transcript && (
                 <div>
-                  <h3 className="mb-1 text-xs uppercase tracking-wider text-moss">Transcript</h3>
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-moss">
+                  <h3 className="mb-1.5 text-[10px] uppercase tracking-[0.14em] text-dim">
+                    Transcript
+                  </h3>
+                  <p className="whitespace-pre-wrap text-xs leading-relaxed text-dim">
                     {transcriptOpen || !longTranscript
                       ? transcript
                       : transcript.slice(0, TRANSCRIPT_PREVIEW) + "…"}
@@ -217,7 +222,7 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
                   {longTranscript && (
                     <button
                       onClick={() => setTranscriptOpen((v) => !v)}
-                      className="mt-1.5 text-xs text-lichen hover:underline"
+                      className="mt-2 text-[11px] text-ink underline underline-offset-4"
                     >
                       {transcriptOpen ? "Show less" : "Show full transcript"}
                     </button>
@@ -227,38 +232,38 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
 
               {/* Tags */}
               <div>
-                <h3 className="mb-2 text-xs uppercase tracking-wider text-moss">Tags</h3>
+                <h3 className="mb-2 text-[10px] uppercase tracking-[0.14em] text-dim">Tags</h3>
                 <TagEditor key={node.tags.join("|")} tags={node.tags} onSave={saveTags} />
               </div>
 
               {/* Source link + delete */}
-              <div className="flex items-center justify-between border-t border-seam pt-4">
+              <div className="flex items-center justify-between border-t border-line pt-4">
                 {node.source_url ? (
                   <a
                     href={node.source_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-sm text-lichen hover:underline"
+                    className="inline-flex items-center gap-1.5 text-xs text-ink underline underline-offset-4"
                   >
                     Open original <ExternalIcon />
                   </a>
                 ) : (
-                  <span className="text-sm text-moss">Added directly</span>
+                  <span className="text-xs text-dim">Added directly</span>
                 )}
                 {confirmDelete ? (
-                  <span className="flex items-center gap-2 text-xs">
-                    <span className="text-moss">Delete this save?</span>
-                    <button onClick={remove} className="rounded-full bg-ember px-3 py-1 font-medium text-ink">
+                  <span className="flex items-center gap-2 text-[11px]">
+                    <span className="text-dim">Delete this save?</span>
+                    <button onClick={remove} className="bg-ember px-3 py-1 font-medium text-paper">
                       Delete
                     </button>
-                    <button onClick={() => setConfirmDelete(false)} className="text-moss hover:text-fog">
+                    <button onClick={() => setConfirmDelete(false)} className="text-dim hover:text-ink">
                       Keep
                     </button>
                   </span>
                 ) : (
                   <button
                     onClick={() => setConfirmDelete(true)}
-                    className="text-xs text-moss hover:text-ember"
+                    className="text-[11px] text-dim transition-colors hover:text-ember"
                   >
                     Delete
                   </button>
@@ -268,13 +273,15 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
               {/* Related saves */}
               {related.length > 0 && (
                 <div>
-                  <h3 className="mb-2 text-xs uppercase tracking-wider text-moss">Related saves</h3>
-                  <div className="grid grid-cols-3 gap-2">
+                  <h3 className="mb-2 text-[10px] uppercase tracking-[0.14em] text-dim">
+                    Related saves
+                  </h3>
+                  <div className="grid grid-cols-3 gap-3">
                     {related.map((r) => (
                       <button
                         key={r.id}
                         onClick={() => load(r.id)}
-                        className="group overflow-hidden rounded-card border border-seam bg-raised text-left hover:border-moss/60"
+                        className="group border border-line text-left transition-colors hover:border-ink"
                       >
                         {r.thumbnail_url ? (
                           // eslint-disable-next-line @next/next/no-img-element
@@ -288,7 +295,7 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
                             }}
                           />
                         ) : null}
-                        <p className="truncate px-2 py-1.5 text-[11px] text-moss group-hover:text-fog">
+                        <p className="truncate px-2 py-1.5 text-[10px] text-dim group-hover:text-ink">
                           {r.title || "Untitled"}
                         </p>
                       </button>

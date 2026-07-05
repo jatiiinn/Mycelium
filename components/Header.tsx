@@ -1,7 +1,10 @@
 "use client";
 
+// Header matched to the reference: brand left, centered "Grid / Graph" nav
+// (Graph is a disabled phase-2 placeholder), quiet utilities on the right.
+
 import { useEffect, useRef, useState } from "react";
-import { SearchIcon, CloseIcon } from "./Icons";
+import { CloseIcon } from "./Icons";
 import type { TagCount } from "@/lib/types";
 
 interface HeaderProps {
@@ -44,53 +47,49 @@ export default function Header({ tags, activeTag, onSearch, onTag }: HeaderProps
   }, [tagsOpen]);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-seam bg-ink/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6">
+    <header className="sticky top-0 z-30 border-b border-line bg-paper/95 backdrop-blur-sm">
+      <div className="relative mx-auto flex max-w-[1440px] flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5 text-xs sm:px-10">
         {/* Wordmark */}
-        <a href="/" className="flex items-center gap-2 text-base tracking-wide">
-          <span className="h-1.5 w-1.5 rounded-full bg-lichen" aria-hidden />
-          mycelium
+        <a href="/" className="tracking-wide text-ink">
+          Mycelium
         </a>
 
-        {/* Search */}
-        <div className="relative order-3 w-full sm:order-2 sm:w-auto sm:flex-1 sm:max-w-md">
-          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-moss" />
-          <input
-            value={q}
-            onChange={(e) => handleQuery(e.target.value)}
-            placeholder="Search titles, captions, transcripts, tags…"
-            aria-label="Search saves"
-            className="w-full rounded-full border border-seam bg-surface py-2 pl-9 pr-9 text-sm text-fog placeholder:text-moss outline-none focus:border-lichen"
-          />
-          {q && (
-            <button
-              onClick={() => handleQuery("")}
-              aria-label="Clear search"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-moss hover:text-fog"
-            >
-              <CloseIcon className="h-3.5 w-3.5" />
+        {/* Centered view switch — Graph is a phase-2 placeholder */}
+        <nav
+          aria-label="View"
+          className="order-2 flex items-center gap-1.5 sm:absolute sm:left-1/2 sm:order-none sm:-translate-x-1/2"
+        >
+          <span className="text-ink">Grid</span>
+          <span className="text-dim/60" aria-hidden>/</span>
+          <span className="group relative">
+            <button disabled aria-disabled="true" className="cursor-not-allowed text-dim/50">
+              Graph
             </button>
-          )}
-        </div>
+            <span className="pointer-events-none absolute left-1/2 top-full z-40 mt-1.5 hidden -translate-x-1/2 whitespace-nowrap border border-line bg-paper px-2 py-1 text-[10px] text-dim group-hover:block">
+              Coming soon
+            </span>
+          </span>
+        </nav>
 
-        <div className="order-2 ml-auto flex items-center gap-2 sm:order-3">
+        {/* Right utilities */}
+        <div className="order-1 ml-auto flex items-center gap-4 sm:order-none">
           {/* Tag filter */}
           <div className="relative" ref={panelRef}>
             <button
               onClick={() => setTagsOpen((v) => !v)}
               aria-expanded={tagsOpen}
-              className={`rounded-full border px-3.5 py-2 text-sm transition-colors ${
+              className={
                 activeTag
-                  ? "border-lichen bg-lichen/10 text-lichen"
-                  : "border-seam bg-surface text-moss hover:text-fog"
-              }`}
+                  ? "text-ink underline underline-offset-4"
+                  : "text-dim transition-colors hover:text-ink"
+              }
             >
-              {activeTag ? `#${activeTag}` : "Tags"}
+              {activeTag ? `Tags: ${activeTag}` : "Tags"}
             </button>
             {tagsOpen && (
-              <div className="absolute right-0 top-full z-40 mt-2 max-h-80 w-72 overflow-y-auto rounded-card border border-seam bg-surface p-3 shadow-xl shadow-black/50">
+              <div className="absolute right-0 top-full z-40 mt-2.5 max-h-80 w-72 overflow-y-auto border border-line bg-paper p-3 shadow-lg shadow-black/5">
                 {tags.length === 0 ? (
-                  <p className="px-1 py-2 text-sm text-moss">
+                  <p className="px-1 py-2 text-dim">
                     No tags yet — they appear here once enrichment runs.
                   </p>
                 ) : (
@@ -101,7 +100,7 @@ export default function Header({ tags, activeTag, onSearch, onTag }: HeaderProps
                           onTag(null);
                           setTagsOpen(false);
                         }}
-                        className="rounded-full border border-seam px-2.5 py-1 text-xs text-moss hover:text-fog"
+                        className="border border-line px-2.5 py-1 text-[11px] text-dim hover:text-ink"
                       >
                         Clear filter
                       </button>
@@ -113,14 +112,16 @@ export default function Header({ tags, activeTag, onSearch, onTag }: HeaderProps
                           onTag(t.tag === activeTag ? null : t.tag);
                           setTagsOpen(false);
                         }}
-                        className={`rounded-full px-2.5 py-1 text-xs transition-colors ${
+                        className={`border px-2.5 py-1 text-[11px] transition-colors ${
                           t.tag === activeTag
-                            ? "bg-lichen text-ink"
-                            : "bg-raised text-fog hover:bg-seam"
+                            ? "border-ink bg-ink text-paper"
+                            : "border-line text-ink hover:border-ink"
                         }`}
                       >
                         {t.tag}
-                        <span className="ml-1 text-moss">{t.cnt}</span>
+                        <span className={`ml-1 ${t.tag === activeTag ? "text-paper/60" : "text-dim"}`}>
+                          {t.cnt}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -128,21 +129,26 @@ export default function Header({ tags, activeTag, onSearch, onTag }: HeaderProps
               </div>
             )}
           </div>
+        </div>
 
-          {/* Grid / Graph toggle — Graph is a phase-2 placeholder */}
-          <div className="group relative flex items-center overflow-hidden rounded-full border border-seam bg-surface text-sm">
-            <span className="px-3.5 py-2 bg-raised text-fog">Grid</span>
+        {/* Search — quiet underline field, full width on mobile */}
+        <div className="relative order-3 w-full sm:order-none sm:ml-0 sm:w-44 sm:focus-within:w-64 sm:transition-all">
+          <input
+            value={q}
+            onChange={(e) => handleQuery(e.target.value)}
+            placeholder="Search"
+            aria-label="Search saves"
+            className="w-full border-b border-line bg-transparent pb-1 pr-6 text-xs text-ink placeholder:text-dim outline-none transition-colors focus:border-ink"
+          />
+          {q && (
             <button
-              disabled
-              aria-disabled="true"
-              className="cursor-not-allowed px-3.5 py-2 text-moss/50"
+              onClick={() => handleQuery("")}
+              aria-label="Clear search"
+              className="absolute right-0 top-0 p-0.5 text-dim hover:text-ink"
             >
-              Graph
+              <CloseIcon className="h-3 w-3" />
             </button>
-            <span className="pointer-events-none absolute right-0 top-full z-40 mt-1 hidden translate-y-1 whitespace-nowrap rounded-md border border-seam bg-raised px-2 py-1 text-xs text-moss group-hover:block">
-              Coming soon
-            </span>
-          </div>
+          )}
         </div>
       </div>
     </header>

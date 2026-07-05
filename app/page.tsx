@@ -10,8 +10,7 @@ import { PlusIcon } from "@/components/Icons";
 import type { NodeItem, TagCount } from "@/lib/types";
 
 const BREAKPOINTS = {
-  default: 5, // wide desktop
-  1536: 5,
+  default: 5, // wide desktop, like the reference
   1280: 4,
   1024: 3,
   768: 3,
@@ -73,7 +72,7 @@ export default function HomePage() {
     fetchTags();
   }, [fetchTags]);
 
-  // While anything is pending/processing, quietly poll so shimmer cards
+  // While anything is pending/processing, quietly poll so shimmer captions
   // resolve into tags without a manual refresh.
   const anyBusy = nodes.some(
     (n) => n.enrichment_status === "pending" || n.enrichment_status === "processing"
@@ -96,7 +95,7 @@ export default function HomePage() {
   const emptyLibrary = !loading && nodes.length === 0 && !query && !activeTag && !loadError;
 
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <Header
         tags={tags}
         activeTag={activeTag}
@@ -104,66 +103,70 @@ export default function HomePage() {
         onTag={setActiveTag}
       />
 
-      <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
+      <main className="mx-auto w-full max-w-[1440px] flex-1 px-5 pb-16 pt-10 sm:px-10 sm:pt-14">
         {loading ? (
           <Masonry breakpointCols={BREAKPOINTS} className="masonry" columnClassName="masonry-col">
             {Array.from({ length: 10 }).map((_, i) => (
-              <div
-                key={i}
-                className="shimmer mb-4 rounded-card"
-                style={{ height: 140 + ((i * 53) % 160) }}
-              />
+              <div key={i} className="mb-10">
+                <div className="shimmer w-full" style={{ height: 140 + ((i * 53) % 160) }} />
+                <div className="shimmer mt-2 h-3 w-10" />
+              </div>
             ))}
           </Masonry>
         ) : loadError ? (
-          <div className="mx-auto mt-24 max-w-sm text-center">
-            <p className="text-sm text-ember">{loadError}</p>
+          <div className="mx-auto mt-28 max-w-sm text-center">
+            <p className="text-xs text-ember">{loadError}</p>
             <button
               onClick={() => fetchNodes()}
-              className="mt-4 rounded-full border border-seam px-4 py-2 text-sm text-fog hover:border-lichen"
+              className="mt-5 border border-ink px-4 py-2 text-xs text-ink transition-colors hover:bg-ink hover:text-paper"
             >
               Try again
             </button>
           </div>
         ) : emptyLibrary ? (
-          <div className="mx-auto mt-24 max-w-sm text-center">
-            <span className="mx-auto mb-4 block h-2 w-2 rounded-full bg-lichen" aria-hidden />
-            <h2 className="text-base font-medium">Nothing here yet</h2>
-            <p className="mt-2 text-sm leading-relaxed text-moss">
+          <div className="mx-auto mt-28 max-w-sm text-center">
+            <h2 className="text-sm text-ink">Nothing here yet</h2>
+            <p className="mt-2 text-xs leading-relaxed text-dim">
               Save something to Raindrop from Instagram, X, or Pinterest and it appears here
               within about 10 minutes — or add a link, image, or note now with the + button.
             </p>
             <button
               onClick={() => setAddOpen(true)}
-              className="mt-5 rounded-full bg-lichen px-5 py-2 text-sm font-medium text-ink"
+              className="mt-6 bg-ink px-5 py-2 text-xs text-paper"
             >
               Add your first save
             </button>
           </div>
         ) : emptyBecauseFiltered ? (
-          <div className="mx-auto mt-24 max-w-sm text-center">
-            <h2 className="text-base font-medium">No matches</h2>
-            <p className="mt-2 text-sm text-moss">
+          <div className="mx-auto mt-28 max-w-sm text-center">
+            <h2 className="text-sm text-ink">No matches</h2>
+            <p className="mt-2 text-xs leading-relaxed text-dim">
               Nothing matches {query ? <>“{query}”</> : null}
               {query && activeTag ? " with " : ""}
-              {activeTag ? <>#{activeTag}</> : null}. Try a different search or clear the tag
-              filter.
+              {activeTag ? <>tag “{activeTag}”</> : null}. Try a different search or clear the
+              tag filter.
             </p>
           </div>
         ) : (
           <Masonry breakpointCols={BREAKPOINTS} className="masonry" columnClassName="masonry-col">
-            {nodes.map((node) => (
-              <NodeCard key={node.id} node={node} onOpen={setOpenNodeId} />
+            {nodes.map((node, i) => (
+              <NodeCard key={node.id} node={node} index={i} onOpen={setOpenNodeId} />
             ))}
           </Masonry>
         )}
       </main>
 
+      {/* Quiet footer strip, like the reference */}
+      <footer className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-5 pb-5 text-[10px] text-dim sm:px-10">
+        <span>Personal archive</span>
+        <span>{loading ? "" : `${nodes.length} ${nodes.length === 1 ? "save" : "saves"}`}</span>
+      </footer>
+
       {/* Persistent add button */}
       <button
         onClick={() => setAddOpen(true)}
         aria-label="Add a save"
-        className="fixed bottom-6 right-6 z-40 rounded-full bg-lichen p-4 text-ink shadow-lg shadow-black/40 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-fog"
+        className="fixed bottom-6 right-6 z-40 rounded-full bg-ink p-4 text-paper shadow-lg shadow-black/15 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
       >
         <PlusIcon />
       </button>
