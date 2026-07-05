@@ -11,12 +11,15 @@ import TagEditor from "./TagEditor";
 interface NodeModalProps {
   nodeId: string;
   onClose: () => void;
-  onChanged: () => void; // tell the grid to refetch (tags edited, retried, deleted)
+  onChanged: () => void; // tell the grid to refetch (tags edited, retried)
+  onDeleted: (id: string) => void; // grid removes the card immediately
+  onMissing: (id: string) => void; // opened a save that no longer exists
+  onToast: (msg: string) => void;
 }
 
 const TRANSCRIPT_PREVIEW = 320;
 
-export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps) {
+export default function NodeModal({ nodeId, onClose, onChanged, onDeleted, onMissing, onToast }: NodeModalProps) {
   const [node, setNode] = useState<NodeItem | null>(null);
   const [related, setRelated] = useState<RelatedNode[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,6 +28,7 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
   const [imgBroken, setImgBroken] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const load = useCallback(async (id: string) => {
     setLoading(true);
     setError(null);
@@ -33,6 +37,10 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
     setConfirmDelete(false);
     try {
       const res = await fetch(`/api/nodes/${id}`);
+      if (res.status === 404) {
+        onMissing(id); // closes the modal and drops the stale card
+        return;
+      }
       if (!res.ok) throw new Error((await res.json()).error ?? "Failed to load");
       const json = await res.json();
       setNode(json.node);
@@ -71,6 +79,7 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
     if (!res.ok) throw new Error((await res.json()).error ?? "Couldn't save tags.");
     const json = await res.json();
     setNode(json.node);
+    onToast("Tags saved");
     onChanged();
   }
 
@@ -80,14 +89,21 @@ export default function NodeModal({ nodeId, onClose, onChanged }: NodeModalProps
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ retry: true }),
     });
+    onToast("Re-organizing this save…");
     onChanged();
     load(nodeId);
   }
 
   async function remove() {
-    await fetch(`/api/nodes/${nodeId}`, { method: "DELETE" });
-    onChanged();
+    // Optimistic: the card disappears from the grid immediately; the modal
+    // closes without waiting on the network.
+    onDeleted(nodeId);
     onClose();
+    try {
+      await fetch(`/api/nodes/${nodeId}`, { method: "DELETE" });
+    } finally {
+      onChanged(); // background re-sync keeps counts and tags honest
+    }
   }
 
   const transcript = node?.transcript ?? "";

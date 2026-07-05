@@ -26,6 +26,14 @@ export default function HomePage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [openNodeId, setOpenNodeId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = useCallback((msg: string) => {
+    setToast(msg);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 2200);
+  }, []);
 
   // Keep latest filters available to the poller without re-registering it.
   const filters = useRef({ query: "", tag: null as string | null });
@@ -89,6 +97,23 @@ export default function HomePage() {
   function refreshAll() {
     fetchNodes({ silent: true });
     fetchTags();
+  }
+
+  function handleDeleted(id: string) {
+    setNodes((prev) => prev.filter((n) => n.id !== id)); // gone instantly
+    showToast("Deleted");
+  }
+
+  function handleMissing(id: string) {
+    setOpenNodeId(null);
+    setNodes((prev) => prev.filter((n) => n.id !== id));
+    showToast("That save no longer exists");
+    fetchTags();
+  }
+
+  function handleAdded(label: string) {
+    showToast(label);
+    refreshAll();
   }
 
   const emptyBecauseFiltered = !loading && nodes.length === 0 && (query || activeTag);
@@ -176,9 +201,23 @@ export default function HomePage() {
           nodeId={openNodeId}
           onClose={() => setOpenNodeId(null)}
           onChanged={refreshAll}
+          onDeleted={handleDeleted}
+          onMissing={handleMissing}
+          onToast={showToast}
         />
       )}
-      {addOpen && <AddModal onClose={() => setAddOpen(false)} onAdded={refreshAll} />}
+      {addOpen && <AddModal onClose={() => setAddOpen(false)} onAdded={handleAdded} />}
+
+      {/* Toast — quiet black pill, auto-dismisses */}
+      {toast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="toast-in fixed bottom-8 left-1/2 z-[60] -translate-x-1/2 bg-ink px-4 py-2.5 text-xs text-paper shadow-lg shadow-black/20"
+        >
+          {toast}
+        </div>
+      )}
     </div>
   );
 }

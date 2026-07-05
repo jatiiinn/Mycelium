@@ -14,9 +14,12 @@ export async function GET(
     .from("nodes")
     .select(NODE_COLUMNS)
     .eq("id", params.id)
-    .single();
-  if (error || !node) {
-    return NextResponse.json({ error: error?.message ?? "not found" }, { status: 404 });
+    .maybeSingle();
+  if (error) {
+    return NextResponse.json({ error: "Couldn't load this save." }, { status: 500 });
+  }
+  if (!node) {
+    return NextResponse.json({ error: "This save no longer exists." }, { status: 404 });
   }
 
   const { data: related } = await sb.rpc("related_nodes", {

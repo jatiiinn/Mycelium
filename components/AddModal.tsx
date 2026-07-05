@@ -7,7 +7,7 @@ type Tab = "link" | "image" | "note";
 
 interface AddModalProps {
   onClose: () => void;
-  onAdded: () => void;
+  onAdded: (label: string) => void; // e.g. "Link saved" — grid shows a toast
 }
 
 export default function AddModal({ onClose, onAdded }: AddModalProps) {
@@ -55,7 +55,13 @@ export default function AddModal({ onClose, onAdded }: AddModalProps) {
         const json = await res.json().catch(() => ({}));
         throw new Error(json.error ?? "Couldn't add that. Try again.");
       }
-      onAdded();
+      onAdded(
+        tab === "link"
+          ? "Link saved — organizing it now"
+          : tab === "image"
+          ? "Image uploaded — organizing it now"
+          : "Note saved — organizing it now"
+      );
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't add that. Try again.");

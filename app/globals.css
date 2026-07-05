@@ -39,3 +39,21 @@
   scrollbar-width: thin;
   scrollbar-color: #d9d9d9 transparent;
 }
+
+/* card entrance */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.card-in { animation: fadeUp 0.35s ease both; }
+
+/* toast */
+@keyframes toastIn {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+.toast-in { animation: toastIn 0.22s ease both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .card-in, .toast-in { animation: none; }
+}
