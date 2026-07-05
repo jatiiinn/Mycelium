@@ -48,7 +48,7 @@ deploy this folder as a **Docker** service — no manual installation needed.
    | `GEMINI_API_KEY` | from aistudio.google.com → Get API key |
    | `SYNC_URL` | `https://YOUR-APP.vercel.app/api/sync` (set after Vercel deploy) |
    | `CRON_SECRET` | the SAME random string you set in Vercel |
-   | `GEMINI_MODEL` | *(optional)* defaults to `gemini-2.0-flash` |
+   | `GEMINI_MODEL` | *(optional)* defaults to `gemini-2.5-flash-lite` |
    | `MAX_VIDEO_MB` | *(optional)* defaults to `60` |
    | `YTDLP_EXTRA_ARGS` | *(optional)* see Instagram note below |
 

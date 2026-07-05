@@ -3,7 +3,12 @@
 import { log } from "./log.js";
 
 const BASE = "https://generativelanguage.googleapis.com/v1beta";
-const EMBED_MODEL = "text-embedding-004"; // 768 dimensions — matches vector(768)
+// gemini-embedding-001 (text-embedding-004 was shut down by Google on
+// 2026-01-14). Its native size is 3072 dims; we request 768 via MRL truncation
+// to match the vector(768) column, then re-normalize (required for truncated
+// dims so cosine distance behaves correctly).
+const EMBED_MODEL = "gemini-embedding-001";
+const EMBED_DIMS = 768;
 
 function apiKey(): string {
   const key = process.env.GEMINI_API_KEY;
@@ -12,7 +17,11 @@ function apiKey(): string {
 }
 
 function genModel(): string {
-  return process.env.GEMINI_MODEL || "gemini-2.0-flash";
+  // gemini-2.0-flash was shut down by Google on 2026-06-01.
+  // 2.5-flash-lite is its like-for-like replacement (same price tier, GA,
+  // multimodal). Override with the GEMINI_MODEL env var when Google rotates
+  // models again — no code change needed.
+  return process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 }
 
 export interface TagSummary {
@@ -130,6 +139,7 @@ export async function embed(text: string): Promise<number[]> {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         content: { parts: [{ text: text.slice(0, 8000) }] },
+        outputDimensionality: EMBED_DIMS,
       }),
     }
   );
@@ -139,8 +149,12 @@ export async function embed(text: string): Promise<number[]> {
   }
   const json = (await res.json()) as { embedding?: { values?: number[] } };
   const values = json.embedding?.values;
-  if (!values || values.length !== 768) {
+  if (!values || values.length !== EMBED_DIMS) {
     throw new Error(`embedding missing or wrong size (${values?.length ?? 0})`);
   }
-  return values;
+  // Truncated (non-3072) gemini-embedding-001 vectors are not unit-length;
+  // normalize so cosine distance in pgvector is meaningful.
+  const norm = Math.sqrt(values.reduce((acc, v) => acc + v * v, 0));
+  if (!isFinite(norm) || norm === 0) throw new Error("embedding norm is zero");
+  return values.map((v) => v / norm);
 }
